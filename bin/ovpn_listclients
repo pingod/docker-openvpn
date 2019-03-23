@@ -15,8 +15,6 @@ cd "$EASYRSA_PKI"
 
 if [ -e crl.pem ]; then
     cat ca.crt crl.pem > cacheck.pem
-else
-    cat ca.crt > cacheck.pem
 fi
 
 echo "name,begin,end,status"
@@ -28,27 +26,20 @@ for name in issued/*.crt; do
     name=${name%.crt}
     name=${name#issued/}
     if [ "$name" != "$OVPN_CN" ]; then
-        # check for revocation or expiration
-        command="openssl verify -crl_check -CAfile cacheck.pem $path"
-        result=$($command)
-        if [ $(echo "$result" | wc -l) == 1 ] && [ "$(echo "$result" | grep ": OK")" ]; then
-            status="VALID"
+    if [ -e crl.pem ]; then
+        if openssl verify -crl_check -CAfile cacheck.pem $path &> /dev/null; then
+	status="VALID"
         else
-            result=$(echo "$result" | tail -n 1 | grep error | cut -d" " -f2)
-            case $result in
-                10)
-                    status="EXPIRED"
-                    ;;
-                23)
-                    status="REVOKED"
-                    ;;
-                *)
-                    status="INVALID"
-            esac
+	status="REVOKED"
         fi
+    else
+        status="VALID"
+    fi
+
         echo "$name,$begin,$end,$status"
     fi
 done
 
-# Clean
-rm cacheck.pem
+if [ -e crl.pem ]; then
+    rm cacheck.pem
+fi
