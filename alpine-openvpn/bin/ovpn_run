@@ -13,11 +13,11 @@ echo -e "如果容器无法运行，请在运行前彻底删除容器挂载的�
 
 if [[ -z $server_addr ]];then
   echo -e "你必须向容器中定义server_addr变量"
-  server_addr=0.0.0.0
+  server_addr=vpn_server
   exit 1
 else
   echo -e "为 ${server_addr} 生成配置文件"
-  ovpn_genconfig -u udp://${server_addr}
+  ovpn_genconfig -u tcp://${server_addr}
 fi
 
 if [[ -d /etc/openvpn/pki ]];then
@@ -129,4 +129,5 @@ fi
 
 echo "Running 'openvpn ${ARGS[@]} ${USER_ARGS[@]}'"
 #将进程放置到后台
-exec nohup openvpn ${ARGS[@]} ${USER_ARGS[@]} &
+#exec nohup openvpn ${ARGS[@]} ${USER_ARGS[@]} &
+exec  openvpn ${ARGS[@]} ${USER_ARGS[@]} 
