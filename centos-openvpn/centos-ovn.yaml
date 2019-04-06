@@ -1,0 +1,54 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: centos-ovn
+  labels:
+    dce.daocloud.io/component: centos-ovn
+    dce.daocloud.io/app: crossx-ovn
+  namespace: dev-env
+  annotations: {}
+spec:
+  template:
+    spec:
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      containers:
+        - securityContext:
+            privileged: true
+          name: centos-ovn
+          image: 'registry.cn-hangzhou.aliyuncs.com/sourcegarden/openvpn:centos-v1.0'
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 500m
+              memory: '100Mi'
+            limits:
+              cpu: 500m
+              memory: '100Mi'
+    metadata:
+      labels:
+        dce.daocloud.io/component: centos-ovn
+        dce.daocloud.io/app: crossx-ovn
+      name: centos-ovn
+  selector:
+    matchLabels:
+      dce.daocloud.io/component: centos-ovn
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: centos-ovn
+  labels:
+    dce.daocloud.io/app: crossx-ovn
+  namespace: dev-env
+  annotations: {}
+spec:
+  selector:
+    dce.daocloud.io/component: centos-ovn
+    dce.daocloud.io/app: crossx-ovn
+  type: ClusterIP
+  ports:
+    - targetPort: 1194
+      protocol: TCP
+      port: 1194
+      name: centos-ovn-1194
