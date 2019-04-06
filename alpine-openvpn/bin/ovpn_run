@@ -70,6 +70,7 @@ function addArg {
 # this allows rules/routing to be altered by supplying this function
 # in an included file, such as ovpn_env.sh
 function setupIptablesAndRouting {
+    echo -n "1" > /proc/sys/net/ipv4/ip_forward
     iptables -t nat -C POSTROUTING -s $OVPN_SERVER -o $OVPN_NATDEVICE -j MASQUERADE || {
       iptables -t nat -A POSTROUTING -s $OVPN_SERVER -o $OVPN_NATDEVICE -j MASQUERADE
     }

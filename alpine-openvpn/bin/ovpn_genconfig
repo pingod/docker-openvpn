@@ -146,23 +146,31 @@ OVPN_AUTH='SHA512'
 OVPN_CIPHER='AES-256-CBC'
 OVPN_CLIENT_TO_CLIENT='0'
 OVPN_CN=''
+#是否启用传授压缩
 OVPN_COMP_LZO=0
+#是否启用vpn作为默认网关（所有请求走VPN）
 OVPN_DEFROUTE=0
 OVPN_DEVICE="tun"
-OVPN_DEVICEN=0
+#设备序号
+OVPN_DEVICEN="0"
 OVPN_DISABLE_PUSH_BLOCK_DNS=0
 OVPN_DNS=1
-OVPN_DNS_SERVERS=()
+OVPN_DNS_SERVERS=(10.96.0.2 10.252.141.139)
 OVPN_ENV=${OPENVPN}/ovpn_env.sh
 OVPN_EXTRA_CLIENT_CONFIG=()
-OVPN_EXTRA_SERVER_CONFIG=()
+OVPN_EXTRA_SERVER_CONFIG=("topology subnet" "ifconfig-pool-persist ipp.txt" "sndbuf 0" "rcvbuf 0")
 OVPN_FRAGMENT=''
-OVPN_KEEPALIVE="10 60"
+OVPN_KEEPALIVE="10 120"
 OVPN_MTU=''
 OVPN_NAT=1
 OVPN_PORT='1194'
 OVPN_PROTO='tcp'
-OVPN_PUSH=()
+OVPN_PUSH=("dhcp-option DOMAIN cluster.local" "dhcp-option DOMAIN svc.cluster.local" \
+"comp-lzo no" "route 10.252.97.0 255.255.255.0" "route 10.252.96.0 255.255.255.0" \
+"route 10.1.1.3 255.255.255.255" "route 10.252.65.54 255.255.255.255" "route 10.252.96.208 255.255.255.255" \
+"route 10.252.96.209 255.255.255.255" "route 10.1.2.179 255.255.255.255" "route 10.252.67.0 255.255.255.0" \
+"route 10.252.70.0 255.255.255.128" "route 10.252.65.62 255.255.255.255" "route 10.96.0.0 255.240.0.0" "route 10.80.28.173 255.255.255.255" \
+"redirect-gateway def1 bypass-dhcp" )
 OVPN_ROUTES=()
 OVPN_SERVER=192.168.255.0/24
 OVPN_SERVER_URL=''
@@ -324,7 +332,7 @@ key $EASYRSA_PKI/private/${OVPN_CN}.key
 ca $EASYRSA_PKI/ca.crt
 cert $EASYRSA_PKI/issued/${OVPN_CN}.crt
 dh $EASYRSA_PKI/dh.pem
-tls-auth $EASYRSA_PKI/ta.key
+tls-auth $EASYRSA_PKI/ta.key 0
 key-direction 0
 keepalive $OVPN_KEEPALIVE
 persist-key
