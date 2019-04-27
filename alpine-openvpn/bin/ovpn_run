@@ -20,6 +20,7 @@ else
   ovpn_genconfig -u tcp://${server_addr}
 fi
 
+
 if [[ -d /etc/openvpn/pki ]];then
   echo -e "已经存在PKI目录，跳过PKI生成"
 else
