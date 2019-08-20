@@ -1,25 +1,22 @@
 #!/bin/bash
 
-#
-# Run the OpenVPN server normally
-#
-
 if [ "$DEBUG" == "1" ]; then
   set -x
 fi
+
 set -e
 
 echo -e "如果容器无法运行，请在运行前彻底删除容器挂载的路径(如果你有使用-v /demo/openvpn:/etc/openvpn)"
 
 if [[ -z $server_addr ]];then
   echo -e "你必须向容器中定义server_addr变量"
-  server_addr=vpn_server
   exit 1
-else
+fi
+
+if [[ ! -f /etc/openvpn/openvpn.conf ]];then
   echo -e "为 ${server_addr} 生成配置文件"
   ovpn_genconfig -u tcp://${server_addr}
 fi
-
 
 if [[ -d /etc/openvpn/pki ]];then
   echo -e "已经存在PKI目录，跳过PKI生成"
@@ -30,16 +27,16 @@ else
 fi
 
 if `find /etc/openvpn/pki -type f -name daocloud* >/dev/null `;then
-  echo -e "文件已经存在,下面将重新生成demo客户端配置"
+  echo -e "文件已经存在,将跳过生成预置客户端配置文件"
   find  /etc/openvpn/pki/ -type f -name daocloud* -exec rm -fr {} \;
   sed -i "/CN=daocloud-boe/d" /etc/openvpn/pki/index.txt
   easyrsa build-client-full daocloud-boe nopass
 else
-  echo -e "生成客户端配置文件"
+  echo -e "生成预置客户端配置文件"
   easyrsa build-client-full daocloud-boe nopass
 fi
 
-echo -e "导出客户端配置文件"
+echo -e "导出预置客户端配置文件"
 ovpn_getclient daocloud-boe > ${OPENVPN}/daocloud-boe.ovpn
 
 cd $OPENVPN
