@@ -325,6 +325,7 @@ fi
 cat > "$conf" <<EOF
 server $(getroute $OVPN_SERVER)
 verb 3
+client-config-dir ccd
 key $EASYRSA_PKI/private/${OVPN_CN}.key
 ca $EASYRSA_PKI/ca.crt
 cert $EASYRSA_PKI/issued/${OVPN_CN}.crt
